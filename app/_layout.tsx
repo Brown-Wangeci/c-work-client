@@ -1,39 +1,53 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { Stack } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
-import 'react-native-reanimated';
+import { SafeAreaView } from "react-native-safe-area-context";
+import { View, StyleSheet } from 'react-native';
 
-import { useColorScheme } from '@/hooks/useColorScheme';
-
-// Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+  const [fontsLoaded] = useFonts({
+    'poppins-extra-bold': require('../assets/fonts/Poppins-ExtraBold.ttf'),
+    'poppins-bold': require('../assets/fonts/Poppins-Bold.ttf'),
+    'poppins-medium': require('../assets/fonts/Poppins-Medium.ttf'),
+    'poppins-regular': require('../assets/fonts/Poppins-Regular.ttf'),
   });
 
   useEffect(() => {
-    if (loaded) {
+    if (fontsLoaded) {
       SplashScreen.hideAsync();
     }
-  }, [loaded]);
+  }, [fontsLoaded]);
 
-  if (!loaded) {
-    return null;
-  }
+  if (!fontsLoaded) return null; // Prevent rendering before fonts are loaded
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        <Stack 
+          screenOptions={{ 
+            headerShown: false
+           }}
+        >
+          <Stack.Screen name="(app)" />
+          <Stack.Screen name="(auth)" />
+          <Stack.Screen name="index" />
+        </Stack>
+      </View>
+      <StatusBar style="light" />
+    </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#171717",
+  },
+  container: {
+    flex: 1,
+  },
+});
